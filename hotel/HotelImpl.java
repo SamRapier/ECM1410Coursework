@@ -2,11 +2,10 @@
 package hotel;
 
 import java.util.ArrayList;
-import java.util.Scanner;
 import java.io.File;
 import java.io.FileReader;
 import java.io.BufferedReader;
-import java.io.IOException;
+import java.time.LocalDate;
 
 public class HotelImpl implements Hotel {
 
@@ -32,6 +31,7 @@ public class HotelImpl implements Hotel {
 		}
 	}
 
+	@Override
 	public boolean importRoomsData(String roomsTxtFileName) {
 		try {
 			File file = new File(roomsTxtFileName);
@@ -53,6 +53,7 @@ public class HotelImpl implements Hotel {
 
 	}
 
+	@Override
 	public boolean importGuestsData(String guestsTxtFileName) {
 		try {
 			File file = new File(guestsTxtFileName);
@@ -74,6 +75,7 @@ public class HotelImpl implements Hotel {
 
 	}
 
+	@Override
 	public boolean importBookingsData(String bookingsTxtFileName) {
 		try {
 			File file = new File(bookingsTxtFileName);
@@ -95,6 +97,7 @@ public class HotelImpl implements Hotel {
 
 	}
 
+	@Override
 	public boolean importPaymentsData(String paymentsTxtFileName) {
 		try {
 			File file = new File(paymentsTxtFileName);
@@ -116,28 +119,122 @@ public class HotelImpl implements Hotel {
 
 	}
 
+	@Override
 	public void displayAllRooms() {
 		for (String room : roomsArray) {
 			System.out.println(room);
 		}
 	}
 
+	@Override
 	public void displayAllGuests() {
 		for (String guest : guestsArray) {
 			System.out.println(guest);
 		}
 	}
 
+	@Override
 	public void displayAllBookings() {
 		for (String booking : bookingsArray) {
 			System.out.println(booking);
 		}
 	}
 
+	@Override
 	public void displayAllPayments() {
 		for (String payment : paymentsArray) {
 			System.out.println(payment);
 		}
 	}
 
+	@Override
+	public boolean addRoom(int roomNumber, RoomType roomType, double price, int capacity, String facilities) {
+		return false;
+	}
+
+	@Override
+	public boolean removeRoom(int roomNumber) {
+		return false;
+	}
+
+	@Override
+	public boolean addGuest(String fName, String lName, LocalDate dateJoin) {
+		return false;
+	}
+
+	@Override
+	public boolean addGuest(String fName, String lName, LocalDate dateJoin, LocalDate VIPstartDate,
+			LocalDate VIPexpiryDate) {
+		return false;
+	}
+
+	@Override
+	public boolean removeGuest(int guestID) {
+		return false;
+	}
+
+	@Override
+	public boolean isAvailable(int roomNumber, LocalDate checkin, LocalDate checkout) {
+		return false;
+	}
+
+	@Override
+	public int[] availableRooms(RoomType roomType, LocalDate checkin, LocalDate checkout) {
+		return null;
+	}
+
+	@Override
+	public int bookOneRoom(int guestID, RoomType roomType, LocalDate checkin, LocalDate checkout) {
+		return 0;
+	}
+
+	@Override
+	public boolean checkOut(int bookingID, LocalDate actualCheckoutDate) {
+		return false;
+	}
+
+	@Override
+	public boolean cancelBooking(int bookingID) {
+		return false;
+	}
+
+	@Override
+	public int[] searchGuest(String firstName, String lastName) {
+		return null;
+	}
+
+	@Override
+	public void displayGuestBooking(int guestID) {
+
+	}
+
+	@Override
+	public void displayBookingsOn(LocalDate thisDate) {
+
+	}
+
+	@Override
+	public void displayPaymentsOn(LocalDate thisDate) {
+
+	}
+
+	@Override
+	public boolean saveRoomsData(String roomsTxtFileName) {
+		return false;
+	}
+
+	@Override
+	public boolean saveGuestsData(String guestsTxtFileName) {
+		return false;
+	}
+
+	@Override
+	public boolean saveBookingsData(String bookingsTxtFileName) {
+		return false;
+	}
+
+	@Override
+	public boolean savePaymentsData(String paymentsTxtFileName) {
+		return false;
+	}
 }
