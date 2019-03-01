@@ -1,0 +1,11 @@
+{
+	"configurations": [
+		{
+			"type": "java",
+			"name": "CodeLens (Launch) - HotelTestingApp",
+			"request": "launch",
+			"mainClass": "hotel.HotelTestingApp",
+			"projectName": "ECM1410Coursework_e4c9813c"
+		}
+	]
+}

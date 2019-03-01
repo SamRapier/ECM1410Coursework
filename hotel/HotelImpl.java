@@ -1,4 +1,3 @@
-
 package hotel;
 
 import java.util.ArrayList;
@@ -6,15 +5,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.time.LocalDate;
+import java.io.*;
 
 public class HotelImpl implements Hotel {
 
-	private ArrayList<String> roomsArray = new ArrayList<>();
+	private ArrayList<ArrayList<String>> roomsArray = new ArrayList<>();
 	private ArrayList<String> guestsArray = new ArrayList<>();
-	private ArrayList<String> bookingsArray = new ArrayList<>();
+	private ArrayList<ArrayList<String>> bookingsArray = new ArrayList<>();
 	private ArrayList<String> paymentsArray = new ArrayList<>();
 
-	public HotelImpl(String roomsTxtFileName, String guestsTxtFileName, String bookingsTxtFileName,
+	public HotelImpl(String roomsTxtFileName, String bookingsTxtFileName, String guestsTxtFileName,
 			String paymentsTxtFileName) {
 
 		if (importRoomsData(roomsTxtFileName)) {
@@ -34,16 +34,7 @@ public class HotelImpl implements Hotel {
 	@Override
 	public boolean importRoomsData(String roomsTxtFileName) {
 		try {
-			File file = new File(roomsTxtFileName);
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
-			String line;
-			while ((line = br.readLine()) != null) {
-				// process the line
-				// System.out.println(line);
-				roomsArray.add(line);
-			}
-			br.close();
+			roomsArray = importData(roomsTxtFileName, roomsArray);
 			return true;
 
 		} catch (Exception e) {
@@ -78,16 +69,7 @@ public class HotelImpl implements Hotel {
 	@Override
 	public boolean importBookingsData(String bookingsTxtFileName) {
 		try {
-			File file = new File(bookingsTxtFileName);
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
-			String line;
-			while ((line = br.readLine()) != null) {
-				// process the line
-				// System.out.println(line);
-				bookingsArray.add(line);
-			}
-			br.close();
+			bookingsArray = importData(bookingsTxtFileName, bookingsArray);
 			return true;
 
 		} catch (Exception e) {
@@ -119,9 +101,53 @@ public class HotelImpl implements Hotel {
 
 	}
 
+	public ArrayList<ArrayList<String>> importData(String txtFileName, ArrayList<ArrayList<String>> mainArray)
+			throws Exception {
+		File file = null;
+		FileReader fr = null;
+		BufferedReader br = null;
+
+		try {
+			file = new File(txtFileName);
+			fr = new FileReader(file);
+			br = new BufferedReader(fr);
+			String line;
+
+			while ((line = br.readLine()) != null) {
+				// process the line
+				// roomsArray.add(line);
+				ArrayList<String> dataItems = new ArrayList<>();
+
+				// Could save to an array
+				// loop each letter until a comma is found, add all data before that comma to
+				// array element
+
+				// int prevItem = 0;
+				String currentItem = "";
+				for (int i = 0, n = line.length(); i < n; i++) {
+					char c = line.charAt(i);
+					if (c == ',') {
+						dataItems.add(currentItem);
+						currentItem = "";
+					} else {
+						currentItem += c;
+					}
+				}
+				mainArray.add(dataItems);
+
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		} finally {
+			br.close();
+		}
+
+		return mainArray;
+	}
+
 	@Override
 	public void displayAllRooms() {
-		for (String room : roomsArray) {
+		for (ArrayList<String> room : roomsArray) {
 			System.out.println(room);
 		}
 	}
@@ -135,7 +161,7 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public void displayAllBookings() {
-		for (String booking : bookingsArray) {
+		for (ArrayList<String> booking : bookingsArray) {
 			System.out.println(booking);
 		}
 	}
@@ -149,11 +175,35 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public boolean addRoom(int roomNumber, RoomType roomType, double price, int capacity, String facilities) {
-		return false;
+		try {
+			ArrayList<String> tempArr = new ArrayList<>();
+			tempArr.add(Integer.toString(roomNumber));
+			tempArr.add(roomType.toString().toLowerCase());
+			tempArr.add(Double.toString(price));
+			tempArr.add(Integer.toString(capacity));
+			tempArr.add(facilities);
+
+			roomsArray.add(tempArr);
+			return true;
+		} catch (Exception e) {
+			System.out.println(e);
+			return false;
+		}
 	}
 
 	@Override
 	public boolean removeRoom(int roomNumber) {
+		try {
+			for (int i = 0; i < roomsArray.size(); i++) {
+				if (Integer.parseInt(roomsArray.get(i).get(0)) == roomNumber) {
+					roomsArray.remove(i);
+					return true;
+				}
+			}
+		} catch (Exception e) {
+			System.out.println(e);
+			return false;
+		}
 		return false;
 	}
 
@@ -175,12 +225,43 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public boolean isAvailable(int roomNumber, LocalDate checkin, LocalDate checkout) {
-		return false;
+		for (ArrayList<String> booking : bookingsArray) {
+			if (Integer.parseInt(booking.get(2)) == roomNumber) {
+				LocalDate currentCheckin = LocalDate.parse(booking.get(4));
+				LocalDate currentCheckout = LocalDate.parse(booking.get(5));
+
+				// If the chekin date is between the current booking date, return false
+				if (!(checkin.isBefore(currentCheckin) || checkin.isAfter(currentCheckout))) {
+					return false;
+
+					// If the checkout date is between the current booking date, return false
+				} else if (!(checkout.isBefore(currentCheckin) || checkout.isAfter(currentCheckout))) {
+					return false;
+				}
+			}
+		}
+		return true;
+
 	}
 
 	@Override
 	public int[] availableRooms(RoomType roomType, LocalDate checkin, LocalDate checkout) {
-		return null;
+		ArrayList<Integer> roomNums = new ArrayList<>();
+		for (ArrayList<String> room : roomsArray) {
+			int roomNum = Integer.parseInt(room.get(0));
+			if (room.get(1).equals(roomType.toString().toLowerCase())) {
+				if (isAvailable(roomNum, checkin, checkout)) {
+					roomNums.add(roomNum);
+				}
+			}
+		}
+
+		int[] rooms = new int[roomNums.size()];
+		for (int i = 0; i < roomNums.size(); i++) {
+			rooms[i] = roomNums.get(i);
+		}
+
+		return rooms;
 	}
 
 	@Override
@@ -210,7 +291,15 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public void displayBookingsOn(LocalDate thisDate) {
+		for (ArrayList<String> booking : bookingsArray) {
+			LocalDate currentCheckin = LocalDate.parse(booking.get(4));
+			LocalDate currentCheckout = LocalDate.parse(booking.get(5));
 
+			// If the chekin date is between the current booking date, return false
+			if (!(thisDate.isBefore(currentCheckin) || thisDate.isAfter(currentCheckout))) {
+				System.out.println(booking);
+			}
+		}
 	}
 
 	@Override
@@ -220,6 +309,27 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public boolean saveRoomsData(String roomsTxtFileName) {
+		try {
+			FileWriter writer = new FileWriter(roomsTxtFileName);
+			String line = "";
+
+			StringBuilder lineBuilder = new StringBuilder();
+
+			for (ArrayList<String> room : roomsArray) {
+				for (String i : room) {
+					lineBuilder.append("'").append(i.replace("'", "\\'")).append("',");
+				}
+				lineBuilder.deleteCharAt(line.length() - 1);
+				System.out.println(lineBuilder.toString());
+				writer.write(lineBuilder.toString());
+			}
+
+			writer.close();
+			return true;
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+
 		return false;
 	}
 

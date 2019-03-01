@@ -1,4 +1,5 @@
 package hotel;
+
 /**
  * An enum type for specifying the four room types
  *
