@@ -35,6 +35,3 @@ public class HotelTestingApp {
 		testHotel.saveRoomsData("data\\rooms.txt");
 	}
 }
-
-
-// comment
