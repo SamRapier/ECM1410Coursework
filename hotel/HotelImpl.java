@@ -310,18 +310,22 @@ public class HotelImpl implements Hotel {
 	@Override
 	public boolean saveRoomsData(String roomsTxtFileName) {
 		try {
-			FileWriter writer = new FileWriter(roomsTxtFileName);
+			BufferedWriter writer = new BufferedWriter(new FileWriter(roomsTxtFileName));
 			String line = "";
 
 			StringBuilder lineBuilder = new StringBuilder();
 
 			for (ArrayList<String> room : roomsArray) {
 				for (String i : room) {
-					lineBuilder.append("'").append(i.replace("'", "\\'")).append("',");
+					// lineBuilder.append("'").append(i.replace("'", "\\'")).append("',");
+					line += i + ",";
 				}
-				lineBuilder.deleteCharAt(line.length() - 1);
-				System.out.println(lineBuilder.toString());
-				writer.write(lineBuilder.toString());
+				// lineBuilder.deleteCharAt(line.length() - 1);
+				System.out.println(line);
+
+				// writer.write(lineBuilder.toString());
+
+				line = "";
 			}
 
 			writer.close();
