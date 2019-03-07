@@ -9,11 +9,20 @@ import java.io.*;
 
 public class HotelImpl implements Hotel {
 
+	// initialising the arrays for the internal data storage
 	private ArrayList<ArrayList<String>> roomsArray = new ArrayList<>();
-	private ArrayList<String> guestsArray = new ArrayList<>();
+	private ArrayList<ArrayList<String>> guestsArray = new ArrayList<>();
 	private ArrayList<ArrayList<String>> bookingsArray = new ArrayList<>();
-	private ArrayList<String> paymentsArray = new ArrayList<>();
+	private ArrayList<ArrayList<String>> paymentsArray = new ArrayList<>();
 
+	/**
+	 * Constructor for the HotelImpl Loads all of the files into respective arrays
+	 * 
+	 * @param roomsTxtFileName
+	 * @param bookingsTxtFileName
+	 * @param guestsTxtFileName
+	 * @param paymentsTxtFileName
+	 */
 	public HotelImpl(String roomsTxtFileName, String bookingsTxtFileName, String guestsTxtFileName,
 			String paymentsTxtFileName) {
 
@@ -33,30 +42,22 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public boolean importRoomsData(String roomsTxtFileName) {
+		// Attempts to import the data to the array, otherwise the exception is
+		// outputted
 		try {
-			roomsArray = importData(roomsTxtFileName, roomsArray);
+			importData(roomsTxtFileName, roomsArray);
 			return true;
 
 		} catch (Exception e) {
-			System.out.println(e);
+			System.out.println(e.getMessage());
 			return false;
 		}
-
 	}
 
 	@Override
 	public boolean importGuestsData(String guestsTxtFileName) {
 		try {
-			File file = new File(guestsTxtFileName);
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
-			String line;
-			while ((line = br.readLine()) != null) {
-				// process the line
-				// System.out.println(line);
-				guestsArray.add(line);
-			}
-			br.close();
+			importData(guestsTxtFileName, guestsArray);
 			return true;
 
 		} catch (Exception e) {
@@ -69,7 +70,7 @@ public class HotelImpl implements Hotel {
 	@Override
 	public boolean importBookingsData(String bookingsTxtFileName) {
 		try {
-			bookingsArray = importData(bookingsTxtFileName, bookingsArray);
+			importData(bookingsTxtFileName, bookingsArray);
 			return true;
 
 		} catch (Exception e) {
@@ -82,16 +83,7 @@ public class HotelImpl implements Hotel {
 	@Override
 	public boolean importPaymentsData(String paymentsTxtFileName) {
 		try {
-			File file = new File(paymentsTxtFileName);
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
-			String line;
-			while ((line = br.readLine()) != null) {
-				// process the line
-				// System.out.println(line);
-				paymentsArray.add(line);
-			}
-			br.close();
+			importData(paymentsTxtFileName, paymentsArray);
 			return true;
 
 		} catch (Exception e) {
@@ -101,8 +93,7 @@ public class HotelImpl implements Hotel {
 
 	}
 
-	public ArrayList<ArrayList<String>> importData(String txtFileName, ArrayList<ArrayList<String>> mainArray)
-			throws Exception {
+	public void importData(String txtFileName, ArrayList<ArrayList<String>> mainArray) throws Exception {
 		File file = null;
 		FileReader fr = null;
 		BufferedReader br = null;
@@ -142,8 +133,6 @@ public class HotelImpl implements Hotel {
 		} finally {
 			br.close();
 		}
-
-		return mainArray;
 	}
 
 	@Override
@@ -155,7 +144,7 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public void displayAllGuests() {
-		for (String guest : guestsArray) {
+		for (ArrayList<String> guest : guestsArray) {
 			System.out.println(guest);
 		}
 	}
@@ -169,7 +158,7 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public void displayAllPayments() {
-		for (String payment : paymentsArray) {
+		for (ArrayList<String> payment : paymentsArray) {
 			System.out.println(payment);
 		}
 	}
@@ -177,6 +166,12 @@ public class HotelImpl implements Hotel {
 	@Override
 	public boolean addRoom(int roomNumber, RoomType roomType, double price, int capacity, String facilities) {
 		try {
+			for (int i = 0; i < roomsArray.size(); i++) {
+				if (Integer.parseInt(roomsArray.get(i).get(0)) == roomNumber) {
+					return false;
+				}
+			}
+
 			ArrayList<String> tempArr = new ArrayList<>();
 			tempArr.add(Integer.toString(roomNumber));
 			tempArr.add(roomType.toString().toLowerCase());
@@ -195,6 +190,8 @@ public class HotelImpl implements Hotel {
 	@Override
 	public boolean removeRoom(int roomNumber) {
 		try {
+			// Pre check if room is booked
+
 			for (int i = 0; i < roomsArray.size(); i++) {
 				if (Integer.parseInt(roomsArray.get(i).get(0)) == roomNumber) {
 					roomsArray.remove(i);
@@ -239,10 +236,10 @@ public class HotelImpl implements Hotel {
 				} else if (!(checkout.isBefore(currentCheckin) || checkout.isAfter(currentCheckout))) {
 					return false;
 				}
+				return true;
 			}
 		}
-		return true;
-
+		return false;
 	}
 
 	@Override
@@ -319,7 +316,6 @@ public class HotelImpl implements Hotel {
 					line += i + ",";
 				}
 				String newLine = line.substring(0, line.length() - 1);
-				System.out.println(newLine);
 
 				writer.write(newLine);
 				writer.newLine();
