@@ -353,6 +353,11 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public int[] searchGuest(String firstName, String lastName) {
+		for (int i = 0; i < guestsArray.size(); i++) {
+			if (guestsArray.get(i).get(1).toLowerCase().equals(firstName.toLowerCase()) && (guestsArray.get(i).get(2).toLowerCase().equals(lastName.toLowerCase()))) {
+				;
+			}
+		}
 		return null;
 	}
 
