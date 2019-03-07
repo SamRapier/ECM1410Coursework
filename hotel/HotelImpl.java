@@ -208,7 +208,14 @@ public class HotelImpl implements Hotel {
 	@Override
 	public boolean addGuest(String fName, String lName, LocalDate dateJoin) {
 		try {
+			int lenArr = guestsArray.size() - 1;
+			ArrayList<String> lastItem = guestsArray.get(lenArr);
+			int prevGuestID = Integer.parseInt(lastItem.get(0));
+			
+			int newID = prevGuestID + 1;
+
 			ArrayList<String> tempArr = new ArrayList<>();
+			tempArr.add(Integer.toString(newID));
 			tempArr.add(fName);
 			tempArr.add(lName);
 			tempArr.add(dateJoin.toString());
@@ -219,17 +226,47 @@ public class HotelImpl implements Hotel {
 			System.out.println(e);
 			return false;
 		}
-		return false;
 	}
 
 	@Override
 	public boolean addGuest(String fName, String lName, LocalDate dateJoin, LocalDate VIPstartDate,
 			LocalDate VIPexpiryDate) {
-		return false;
+		try {
+			int lenArr = guestsArray.size() - 1;
+			ArrayList<String> lastItem = guestsArray.get(lenArr);
+			int prevGuestID = Integer.parseInt(lastItem.get(0));
+			
+			int newID = prevGuestID + 1;
+
+			ArrayList<String> tempArr = new ArrayList<>();
+			tempArr.add(Integer.toString(newID));
+			tempArr.add(fName);
+			tempArr.add(lName);
+			tempArr.add(dateJoin.toString());
+			tempArr.add(VIPstartDate.toString());
+			tempArr.add(VIPexpiryDate.toString());
+
+			guestsArray.add(tempArr);
+			return true;
+		} catch (Exception e) {
+			System.out.println(e);
+			return false;	
+		}
 	}
 
 	@Override
 	public boolean removeGuest(int guestID) {
+		try {
+			for (int i = 0; i < guestsArray.size(); i++) {
+				if (Integer.parseInt(guestsArray.get(i).get(0)) == guestID) {
+					roomsArray.remove(i);
+					return true;
+				}
+			}
+		} catch (Exception e){
+			System.out.println(e);
+			return false;
+		}
 		return false;
 	}
 
