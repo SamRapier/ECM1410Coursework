@@ -93,7 +93,16 @@ public class HotelImpl implements Hotel {
 
 	}
 
+	/**
+	 * This method is a genreal method which imports the data from a file and saves
+	 * it to an array, the location of the file and the array to be saved to are
+	 * passed as arguments
+	 * 
+	 * @param txtFileName the fileLocation for the file that we are importing
+	 * @param mainArray   the array that the file is being saved to
+	 */
 	public void importData(String txtFileName, ArrayList<ArrayList<String>> mainArray) throws Exception {
+
 		File file = null;
 		FileReader fr = null;
 		BufferedReader br = null;
@@ -104,6 +113,7 @@ public class HotelImpl implements Hotel {
 			br = new BufferedReader(fr);
 			String line;
 
+			// loops through each
 			while ((line = br.readLine()) != null) {
 				// process the line
 				// roomsArray.add(line);
@@ -113,9 +123,12 @@ public class HotelImpl implements Hotel {
 				// loop each letter until a comma is found, add all data before that comma to
 				// array element
 
-				// int prevItem = 0;
 				String currentItem = "";
+				// Loops through the character in the line
 				for (int i = 0, n = line.length(); i < n; i++) {
+					// every character in the line is checked to see if it is a comma
+					// if it is a comma, the currentItem string is added to the dataItems ArrayList
+					// if it is not a comma, the character is added to the currentItem string
 					char c = line.charAt(i);
 					if (c == ',') {
 						dataItems.add(currentItem);
@@ -124,7 +137,9 @@ public class HotelImpl implements Hotel {
 						currentItem += c;
 					}
 				}
+				// the final dataItem is added to the dataItem array
 				dataItems.add(currentItem);
+				// the dataItems array is added to the mainArray
 				mainArray.add(dataItems);
 
 			}
@@ -190,7 +205,17 @@ public class HotelImpl implements Hotel {
 	@Override
 	public boolean removeRoom(int roomNumber) {
 		try {
-			// Pre check if room is booked
+			// Pre check if room is booked after today
+			for (ArrayList<String> booking : bookingsArray) {
+				if (Integer.parseInt(booking.get(2)) == roomNumber) {
+					LocalDate currentCheckout = LocalDate.parse(booking.get(5));
+					LocalDate currentDate = LocalDate.now();
+
+					if (currentDate.isBefore(currentCheckout)) {
+						return false;
+					}
+				}
+			}
 
 			for (int i = 0; i < roomsArray.size(); i++) {
 				if (Integer.parseInt(roomsArray.get(i).get(0)) == roomNumber) {
@@ -308,24 +333,7 @@ public class HotelImpl implements Hotel {
 	@Override
 	public boolean saveRoomsData(String roomsTxtFileName) {
 		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(roomsTxtFileName));
-			String line = "";
-
-			for (ArrayList<String> room : roomsArray) {
-				for (String i : room) {
-					line += i + ",";
-				}
-				String newLine = line.substring(0, line.length() - 1);
-
-				writer.write(newLine);
-				writer.newLine();
-
-				line = "";
-			}
-
-			// remove last line
-
-			writer.close();
+			saveData(roomsTxtFileName, roomsArray);
 			return true;
 		} catch (Exception e) {
 			System.out.println(e);
@@ -336,16 +344,55 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public boolean saveGuestsData(String guestsTxtFileName) {
+		try {
+			saveData(guestsTxtFileName, guestsArray);
+			return true;
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 		return false;
 	}
 
 	@Override
 	public boolean saveBookingsData(String bookingsTxtFileName) {
+		try {
+			saveData(bookingsTxtFileName, bookingsArray);
+			return true;
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 		return false;
 	}
 
 	@Override
 	public boolean savePaymentsData(String paymentsTxtFileName) {
+		try {
+			saveData(paymentsTxtFileName, paymentsArray);
+			return true;
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 		return false;
+	}
+
+	public void saveData(String txtFileName, ArrayList<ArrayList<String>> mainArray) throws Exception {
+		BufferedWriter writer = new BufferedWriter(new FileWriter(txtFileName));
+		String line = "";
+
+		for (ArrayList<String> item : mainArray) {
+			for (String i : item) {
+				line += i + ",";
+			}
+			String newLine = line.substring(0, line.length() - 1);
+
+			writer.write(newLine);
+			writer.newLine();
+
+			line = "";
+		}
+
+		// remove last line
+
+		writer.close();
 	}
 }
