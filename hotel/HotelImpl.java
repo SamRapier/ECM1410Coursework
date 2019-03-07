@@ -236,7 +236,7 @@ public class HotelImpl implements Hotel {
 			int lenArr = guestsArray.size() - 1;
 			ArrayList<String> lastItem = guestsArray.get(lenArr);
 			int prevGuestID = Integer.parseInt(lastItem.get(0));
-			
+
 			int newID = prevGuestID + 1;
 
 			ArrayList<String> tempArr = new ArrayList<>();
@@ -260,7 +260,7 @@ public class HotelImpl implements Hotel {
 			int lenArr = guestsArray.size() - 1;
 			ArrayList<String> lastItem = guestsArray.get(lenArr);
 			int prevGuestID = Integer.parseInt(lastItem.get(0));
-			
+
 			int newID = prevGuestID + 1;
 
 			ArrayList<String> tempArr = new ArrayList<>();
@@ -271,24 +271,44 @@ public class HotelImpl implements Hotel {
 			tempArr.add(VIPstartDate.toString());
 			tempArr.add(VIPexpiryDate.toString());
 
+			ArrayList<String> paymentTempArr = new ArrayList<>();
+			paymentTempArr.add(LocalDate.now().toString());
+			paymentTempArr.add(Integer.toString(newID));
+			paymentTempArr.add(Double.toString(50.00));
+			paymentTempArr.add("VIPmembership");
+
 			guestsArray.add(tempArr);
+			paymentsArray.add(paymentTempArr);
 			return true;
 		} catch (Exception e) {
 			System.out.println(e);
-			return false;	
+			return false;
 		}
 	}
 
 	@Override
 	public boolean removeGuest(int guestID) {
 		try {
+			// Pre check if guest is booked in a room in the future
+			for (ArrayList<String> booking : bookingsArray) {
+				if (Integer.parseInt(booking.get(1)) == guestID) {
+					LocalDate currentCheckout = LocalDate.parse(booking.get(5));
+					LocalDate currentDate = LocalDate.now();
+
+					if (currentDate.isBefore(currentCheckout)) {
+						System.out.println("Error - Cannot remove guest - Guest has a booking in future");
+						return false;
+					}
+				}
+			}
+
 			for (int i = 0; i < guestsArray.size(); i++) {
 				if (Integer.parseInt(guestsArray.get(i).get(0)) == guestID) {
-					roomsArray.remove(i);
+					guestsArray.remove(i);
 					return true;
 				}
 			}
-		} catch (Exception e){
+		} catch (Exception e) {
 			System.out.println(e);
 			return false;
 		}
@@ -338,7 +358,64 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public int bookOneRoom(int guestID, RoomType roomType, LocalDate checkin, LocalDate checkout) {
-		return 0;
+		try {
+			// What happens if no rooms available
+			int[] roomChoice = availableRooms(roomType, checkin, checkout);
+
+			int lenArr = bookingsArray.size() - 1;
+			ArrayList<String> lastItem = bookingsArray.get(lenArr);
+			int prevBookID = Integer.parseInt(lastItem.get(0));
+			int newBookingID = prevBookID + 1;
+
+			int roomID = roomChoice[0];
+
+			ArrayList<String> bookingTempArr = new ArrayList<>();
+			bookingTempArr.add(Integer.toString(newBookingID));
+			bookingTempArr.add(Integer.toString(guestID));
+			bookingTempArr.add(Integer.toString(roomID));
+			bookingTempArr.add(LocalDate.now().toString());
+			bookingTempArr.add(checkin.toString());
+			bookingTempArr.add(checkout.toString());
+
+			// Check if guest is VIP
+			boolean guestVIP = false;
+			for (ArrayList<String> guest : guestsArray) {
+				if (Integer.parseInt(guest.get(0)) == guestID) {
+					if (guest.size() > 4) {
+						if (LocalDate.parse(guest.get(5)).isBefore(LocalDate.now())) {
+							guestVIP = true;
+						}
+					}
+				}
+			}
+
+			// Calc price of booking
+			double roomPrice = 0;
+			for (ArrayList<String> room : roomsArray) {
+				if (Integer.parseInt(room.get(0)) == roomID) {
+					roomPrice = Double.parseDouble(room.get(2));
+					if (guestVIP) {
+						roomPrice -= (roomPrice / 10);
+					}
+				}
+			}
+
+			// Add to payment array
+			ArrayList<String> paymentTempArr = new ArrayList<>();
+			paymentTempArr.add(LocalDate.now().toString());
+			paymentTempArr.add(Integer.toString(guestID));
+			paymentTempArr.add(Double.toString(roomPrice));
+			paymentTempArr.add("booking");
+
+			bookingsArray.add(bookingTempArr);
+			paymentsArray.add(paymentTempArr);
+
+			return roomChoice[0];
+
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return -1;
+		}
 	}
 
 	@Override
