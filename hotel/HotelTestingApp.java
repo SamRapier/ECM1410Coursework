@@ -9,7 +9,7 @@ public class HotelTestingApp {
 		// boolean loadedRooms = testHotel.importRoomsData("data\\rooms.txt");
 		// System.out.println(loadedRooms);
 
-		// testHotel.displayAllRooms();
+		testHotel.displayAllRooms();
 		// testHotel.displayAllGuests();
 		// testHotel.displayAllBookings();
 		// testHotel.displayAllPayments();
@@ -25,8 +25,9 @@ public class HotelTestingApp {
 		System.out.println(testHotel.isAvailable(102, LocalDate.parse("2019-04-08"), LocalDate.parse("2019-04-09")));
 
 		// testHotel.displayBookingsOn(LocalDate.parse("2019-04-02"));
-		// int[] rooms = testHotel.availableRooms(RoomType.DOUBLE, LocalDate.parse("2019-03-02"),
-		// 		LocalDate.parse("2019-03-06"));
+		// int[] rooms = testHotel.availableRooms(RoomType.DOUBLE,
+		// LocalDate.parse("2019-03-02"),
+		// LocalDate.parse("2019-03-06"));
 
 		// for (int room : rooms) {
 		// System.out.println(room);
@@ -35,6 +36,3 @@ public class HotelTestingApp {
 		testHotel.saveRoomsData("data\\rooms.txt");
 	}
 }
-
-
-// comment

@@ -133,6 +133,7 @@ public class HotelImpl implements Hotel {
 						currentItem += c;
 					}
 				}
+				dataItems.add(currentItem);
 				mainArray.add(dataItems);
 
 			}
@@ -313,20 +314,20 @@ public class HotelImpl implements Hotel {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(roomsTxtFileName));
 			String line = "";
 
-			StringBuilder lineBuilder = new StringBuilder();
-
 			for (ArrayList<String> room : roomsArray) {
 				for (String i : room) {
-					// lineBuilder.append("'").append(i.replace("'", "\\'")).append("',");
 					line += i + ",";
 				}
-				// lineBuilder.deleteCharAt(line.length() - 1);
-				System.out.println(line);
+				String newLine = line.substring(0, line.length() - 1);
+				System.out.println(newLine);
 
-				// writer.write(lineBuilder.toString());
+				writer.write(newLine);
+				writer.newLine();
 
 				line = "";
 			}
+
+			// remove last line
 
 			writer.close();
 			return true;
