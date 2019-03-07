@@ -210,6 +210,18 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public boolean addGuest(String fName, String lName, LocalDate dateJoin) {
+		try {
+			ArrayList<String> tempArr = new ArrayList<>();
+			tempArr.add(fName);
+			tempArr.add(lName);
+			tempArr.add(dateJoin.toString());
+
+			guestsArray.add(tempArr);
+			return true;
+		} catch (Exception e) {
+			System.out.println(e);
+			return false;
+		}
 		return false;
 	}
 
