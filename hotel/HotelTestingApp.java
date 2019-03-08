@@ -9,16 +9,12 @@ public class HotelTestingApp {
 		// boolean loadedRooms = testHotel.importRoomsData("data\\rooms.txt");
 		// System.out.println(loadedRooms);
 
-		System.out.println("Rooms:");
+		int[] test = new int[0];
+		System.out.println(test == null);
+
 		testHotel.displayAllRooms();
-
-		System.out.println("Guests:");
 		testHotel.displayAllGuests();
-
-		System.out.println("Bookings:");
 		testHotel.displayAllBookings();
-
-		System.out.println("Payments:");
 		testHotel.displayAllPayments();
 
 		// testHotel.addRoom(105, RoomType.SINGLE, 80.00, 2, "own bathroom");
