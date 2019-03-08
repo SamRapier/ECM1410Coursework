@@ -10,10 +10,10 @@ import java.io.*;
 public class HotelImpl implements Hotel {
 
 	// initialising the arrays for the internal data storage
-	private ArrayList<ArrayList<String>> roomsArray = new ArrayList<>();
-	private ArrayList<ArrayList<String>> guestsArray = new ArrayList<>();
-	private ArrayList<ArrayList<String>> bookingsArray = new ArrayList<>();
-	private ArrayList<ArrayList<String>> paymentsArray = new ArrayList<>();
+	private ArrayList<Room> roomsArray = new ArrayList<>();
+	private ArrayList<Guest> guestsArray = new ArrayList<>();
+	private ArrayList<Booking> bookingsArray = new ArrayList<>();
+	private ArrayList<Payment> paymentsArray = new ArrayList<>();
 
 	/**
 	 * Constructor for the HotelImpl Loads all of the files into respective arrays
@@ -45,7 +45,27 @@ public class HotelImpl implements Hotel {
 		// Attempts to import the data to the array, otherwise the exception is
 		// outputted
 		try {
-			importData(roomsTxtFileName, roomsArray);
+			File file = new File(roomsTxtFileName);
+			FileReader fr = new FileReader(file);
+			BufferedReader br = new BufferedReader(fr);
+			String line;
+
+			// loops through each line in the file
+			while ((line = br.readLine()) != null) {
+				ArrayList<String> dataItems = new ArrayList<>();
+				// loop each letter until a comma is found, add all data before that comma to
+				// array element
+
+				separateDataItems(line, dataItems);
+
+				// The newRoom object is made and then added to the roomsArray
+				Room newRoom = new Room(dataItems.get(0), dataItems.get(1), dataItems.get(2), dataItems.get(3),
+						dataItems.get(4));
+				// the dataItems array is added to the mainArray
+
+				roomsArray.add(newRoom);
+			}
+			br.close();
 			return true;
 
 		} catch (Exception e) {
@@ -59,7 +79,28 @@ public class HotelImpl implements Hotel {
 		// Attempts to import the data to the array, otherwise the exception is
 		// outputted
 		try {
-			importData(guestsTxtFileName, guestsArray);
+			File file = new File(guestsTxtFileName);
+			FileReader fr = new FileReader(file);
+			BufferedReader br = new BufferedReader(fr);
+			String line;
+
+			// loops through each line in the file
+			while ((line = br.readLine()) != null) {
+				ArrayList<String> dataItems = new ArrayList<>();
+				separateDataItems(line, dataItems);
+
+				// The newGuest object is made and then added to the guestArray
+				Guest newGuest;
+				if (dataItems.size() == 6) {
+					newGuest = new Guest(dataItems.get(0), dataItems.get(1), dataItems.get(2), dataItems.get(3),
+							dataItems.get(4), dataItems.get(5));
+				} else {
+					newGuest = new Guest(dataItems.get(0), dataItems.get(1), dataItems.get(2), dataItems.get(3));
+				}
+
+				guestsArray.add(newGuest);
+			}
+			br.close();
 			return true;
 
 		} catch (Exception e) {
@@ -72,7 +113,23 @@ public class HotelImpl implements Hotel {
 	@Override
 	public boolean importBookingsData(String bookingsTxtFileName) {
 		try {
-			importData(bookingsTxtFileName, bookingsArray);
+			File file = new File(bookingsTxtFileName);
+			FileReader fr = new FileReader(file);
+			BufferedReader br = new BufferedReader(fr);
+			String line;
+
+			// loops through each line in the file
+			while ((line = br.readLine()) != null) {
+				ArrayList<String> dataItems = new ArrayList<>();
+				separateDataItems(line, dataItems);
+
+				// The newBooking object is made and then added to the bookingsArray
+				Booking newBooking = new Booking(dataItems.get(0), dataItems.get(1), dataItems.get(2), dataItems.get(3),
+						dataItems.get(4), dataItems.get(5));
+
+				bookingsArray.add(newBooking);
+			}
+			br.close();
 			return true;
 
 		} catch (Exception e) {
@@ -87,79 +144,58 @@ public class HotelImpl implements Hotel {
 		// Attempts to import the data to the array, otherwise the exception is
 		// outputted
 		try {
-			importData(paymentsTxtFileName, paymentsArray);
-			return true;
+			File file = new File(paymentsTxtFileName);
+			FileReader fr = new FileReader(file);
+			BufferedReader br = new BufferedReader(fr);
+			String line;
 
+			// loops through each line in the file
+			while ((line = br.readLine()) != null) {
+				ArrayList<String> dataItems = new ArrayList<>();
+				separateDataItems(line, dataItems);
+
+				// The newPayment object is made and then added to the paymentsArray
+				Payment newPayment = new Payment(dataItems.get(0), dataItems.get(1), dataItems.get(2),
+						dataItems.get(3));
+
+				paymentsArray.add(newPayment);
+			}
+			br.close();
+			return true;
 		} catch (Exception e) {
 			System.out.println(e);
 			return false;
 		}
-
 	}
 
-	/**
-	 * This method is a genreal method which imports the data from a file and saves
-	 * it to an array, the location of the file and the array to be saved to are
-	 * passed as arguments
-	 * 
-	 * @param txtFileName the fileLocation for the file that we are importing
-	 * @param mainArray   the array that the file is being saved to
-	 */
-	public void importData(String txtFileName, ArrayList<ArrayList<String>> mainArray) throws Exception {
-
-		File file = null;
-		FileReader fr = null;
-		BufferedReader br = null;
-
-		try {
-			file = new File(txtFileName);
-			fr = new FileReader(file);
-			br = new BufferedReader(fr);
-			String line;
-
-			// loops through each
-			while ((line = br.readLine()) != null) {
-				// process the line
-				// roomsArray.add(line);
-				ArrayList<String> dataItems = new ArrayList<>();
-
-				// Could save to an array
-				// loop each letter until a comma is found, add all data before that comma to
-				// array element
-
-				String currentItem = "";
-				// Loops through the character in the line
-				for (int i = 0, n = line.length(); i < n; i++) {
-					// every character in the line is checked to see if it is a comma
-					// if it is a comma, the currentItem string is added to the dataItems ArrayList
-					// if it is not a comma, the character is added to the currentItem string
-					char c = line.charAt(i);
-					if (c == ',') {
-						dataItems.add(currentItem);
-						currentItem = "";
-					} else {
-						currentItem += c;
-					}
-				}
-				// the final dataItem is added to the dataItem array
+	public void separateDataItems(String line, ArrayList<String> dataItems) {
+		// loop each letter until a comma is found, add all data before that comma to
+		// array element
+		String currentItem = "";
+		// Loops through the character in the line
+		for (int i = 0, n = line.length(); i < n; i++) {
+			// every character in the line is checked to see if it is a comma
+			// if it is a comma, the currentItem string is added to the dataItems ArrayList
+			// if it is not a comma, the character is added to the currentItem string
+			char c = line.charAt(i);
+			if (c == ',') {
 				dataItems.add(currentItem);
-				// the dataItems array is added to the mainArray
-				mainArray.add(dataItems);
-
+				currentItem = "";
+			} else {
+				currentItem += c;
 			}
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		} finally {
-			br.close();
 		}
+		// the final dataItem is added to the dataItem array
+		dataItems.add(currentItem);
+		// return dataItems;
 	}
 
 	@Override
 	public void displayAllRooms() {
 		// Prints the ArrayList of the data on each individual room
 		System.out.println("Rooms:");
-		for (ArrayList<String> room : roomsArray) {
-			System.out.println(room);
+		for (Room room : roomsArray) {
+			System.out.println(room.toString());
 		}
 	}
 
@@ -167,8 +203,8 @@ public class HotelImpl implements Hotel {
 	public void displayAllGuests() {
 		// Prints the ArrayList of the data on each individual guest
 		System.out.println("Guests:");
-		for (ArrayList<String> guest : guestsArray) {
-			System.out.println(guest);
+		for (Guest guest : guestsArray) {
+			System.out.println(guest.toString());
 		}
 	}
 
@@ -176,8 +212,8 @@ public class HotelImpl implements Hotel {
 	public void displayAllBookings() {
 		// Prints the ArrayList of the data on each individual booking
 		System.out.println("Bookings:");
-		for (ArrayList<String> booking : bookingsArray) {
-			System.out.println(booking);
+		for (Booking booking : bookingsArray) {
+			System.out.println(booking.toString());
 		}
 	}
 
@@ -185,8 +221,8 @@ public class HotelImpl implements Hotel {
 	public void displayAllPayments() {
 		// Prints the ArrayList of the data on each individual payment
 		System.out.println("Payments:");
-		for (ArrayList<String> payment : paymentsArray) {
-			System.out.println(payment);
+		for (Payment payment : paymentsArray) {
+			System.out.println(payment.toString());
 		}
 	}
 
@@ -196,21 +232,12 @@ public class HotelImpl implements Hotel {
 			// A pre check is performed to ensure that the roomNumber does not already exist
 			// if a room number already exists, false is returned
 			for (int i = 0; i < roomsArray.size(); i++) {
-				if (Integer.parseInt(roomsArray.get(i).get(0)) == roomNumber) {
+				if (roomsArray.get(i).getRoomNumber() == roomNumber) {
 					return false;
 				}
 			}
 
-			// A temporary array is created to add each of the data items to
-			ArrayList<String> tempArr = new ArrayList<>();
-			tempArr.add(Integer.toString(roomNumber));
-			tempArr.add(roomType.toString().toLowerCase());
-			tempArr.add(Double.toString(price));
-			tempArr.add(Integer.toString(capacity));
-			tempArr.add(facilities);
-
-			// this temporary array is then added to the main room array
-			roomsArray.add(tempArr);
+			roomsArray.add(new Room(roomNumber, roomType, price, capacity, facilities));
 			return true;
 		} catch (Exception e) {
 			System.out.println(e);
@@ -223,10 +250,10 @@ public class HotelImpl implements Hotel {
 		try {
 			// Pre check if the room is booked after today, then the room cannot be removed
 			// loop through each booking
-			for (ArrayList<String> booking : bookingsArray) {
+			for (Booking booking : bookingsArray) {
 				// finds any correlating room numbers
-				if (Integer.parseInt(booking.get(2)) == roomNumber) {
-					LocalDate checkout = LocalDate.parse(booking.get(5));
+				if (booking.getBookingRoomNum() == roomNumber) {
+					LocalDate checkout = booking.getBookingCheckout();
 					LocalDate currentDate = LocalDate.now();
 
 					// if the current date is before the checkout date then the room cannot be
@@ -240,7 +267,7 @@ public class HotelImpl implements Hotel {
 
 			// Loops through the room array and finds the corresponding room number
 			for (int i = 0; i < roomsArray.size(); i++) {
-				if (Integer.parseInt(roomsArray.get(i).get(0)) == roomNumber) {
+				if (roomsArray.get(i).getRoomNumber() == roomNumber) {
 					// removes the room from the array
 					roomsArray.remove(i);
 					return true;
@@ -259,21 +286,13 @@ public class HotelImpl implements Hotel {
 			// This creates a new unique ID for each guest
 			// gets the last item in the guestArray
 			int lenArr = guestsArray.size() - 1;
-			ArrayList<String> lastItem = guestsArray.get(lenArr);
+			Guest lastGuest = guestsArray.get(lenArr);
 			// takes the id of the last item in the guest array
-			int prevGuestID = Integer.parseInt(lastItem.get(0));
+			int prevGuestID = lastGuest.getGuestID();
 			// increments the last guestID by 1 to get the newID
 			int newID = prevGuestID + 1;
 
-			// A temporary arrayList is created to add all the data items to
-			ArrayList<String> tempArr = new ArrayList<>();
-			tempArr.add(Integer.toString(newID));
-			tempArr.add(fName);
-			tempArr.add(lName);
-			tempArr.add(dateJoin.toString());
-
-			// the temporary arraylist is added to the guestArray
-			guestsArray.add(tempArr);
+			guestsArray.add(new Guest(newID, fName, lName, dateJoin));
 			return true;
 		} catch (Exception e) {
 			System.out.println(e);
@@ -288,33 +307,14 @@ public class HotelImpl implements Hotel {
 			// This creates a new unique ID for each guest
 			// gets the last item in the guestArray
 			int lenArr = guestsArray.size() - 1;
-			ArrayList<String> lastItem = guestsArray.get(lenArr);
+			Guest lastGuest = guestsArray.get(lenArr);
 			// takes the id of the last item in the guest array
-			int prevGuestID = Integer.parseInt(lastItem.get(0));
+			int prevGuestID = lastGuest.getGuestID();
 			// increments the last guestID by 1 to get the newID
 			int newID = prevGuestID + 1;
 
-			// A temporary arrayList is created to add all the data items for the new guest
-			// to
-			ArrayList<String> tempArr = new ArrayList<>();
-			tempArr.add(Integer.toString(newID));
-			tempArr.add(fName);
-			tempArr.add(lName);
-			tempArr.add(dateJoin.toString());
-			tempArr.add(VIPstartDate.toString());
-			tempArr.add(VIPexpiryDate.toString());
-
-			// A temporary array to add all the payment data to
-			ArrayList<String> paymentTempArr = new ArrayList<>();
-			paymentTempArr.add(LocalDate.now().toString());
-			paymentTempArr.add(Integer.toString(newID));
-			paymentTempArr.add(Double.toString(50.00));
-			paymentTempArr.add("VIPmembership");
-
-			// adds the guest temp array to the guestsArray
-			guestsArray.add(tempArr);
-			// adds the payment temp array to the paymentsArray
-			paymentsArray.add(paymentTempArr);
+			guestsArray.add(new Guest(newID, fName, lName, dateJoin, VIPstartDate, VIPexpiryDate));
+			paymentsArray.add(new Payment(LocalDate.now(), newID, 50.00, "VIPmembership"));
 			return true;
 		} catch (Exception e) {
 			System.out.println(e);
@@ -326,10 +326,10 @@ public class HotelImpl implements Hotel {
 	public boolean removeGuest(int guestID) {
 		try {
 			// Pre check if guest is booked in a room in the future
-			for (ArrayList<String> booking : bookingsArray) {
-				if (Integer.parseInt(booking.get(1)) == guestID) {
+			for (Booking booking : bookingsArray) {
+				if (booking.getBookingGuestID() == guestID) {
 					// initialises the checkout date and current date
-					LocalDate checkout = LocalDate.parse(booking.get(5));
+					LocalDate checkout = booking.getBookingCheckout();
 					LocalDate currentDate = LocalDate.now();
 
 					// is the current date is before the checkout date, then the guest cannot be
@@ -343,7 +343,7 @@ public class HotelImpl implements Hotel {
 
 			// loops through the guest array unitl the guestID matches
 			for (int i = 0; i < guestsArray.size(); i++) {
-				if (Integer.parseInt(guestsArray.get(i).get(0)) == guestID) {
+				if (guestsArray.get(i).getGuestID() == guestID) {
 					// removes the guest if the ID matches
 					guestsArray.remove(i);
 					return true;
@@ -360,17 +360,17 @@ public class HotelImpl implements Hotel {
 	public boolean isAvailable(int roomNumber, LocalDate checkin, LocalDate checkout) {
 		try {
 			// loops through the room array and checks if the roomNumber exists
-			for (ArrayList<String> room : roomsArray) {
-				if (roomNumber == Integer.parseInt(room.get(0))) {
+			for (Room room : roomsArray) {
+				if (roomNumber == room.getRoomNumber()) {
 
 					// loops through the booking array
-					for (ArrayList<String> booking : bookingsArray) {
+					for (Booking booking : bookingsArray) {
 						// Checks if the roomNumber in the bookingArray matches the roomNumber being
 						// searched for
-						if (Integer.parseInt(booking.get(2)) == roomNumber) {
+						if (booking.getBookingRoomNum() == roomNumber) {
 							// initialises the bookingCHeckin date and the bookingCheckout date
-							LocalDate bookingCheckin = LocalDate.parse(booking.get(4));
-							LocalDate bookingCheckout = LocalDate.parse(booking.get(5));
+							LocalDate bookingCheckin = booking.getBookingCheckin();
+							LocalDate bookingCheckout = booking.getBookingCheckout();
 
 							// If the chekin date is between the current booking date, return false
 							if (!(checkin.isBefore(bookingCheckin) || checkin.isAfter(bookingCheckout))) {
@@ -404,9 +404,9 @@ public class HotelImpl implements Hotel {
 	public int[] availableRooms(RoomType roomType, LocalDate checkin, LocalDate checkout) {
 		try {
 			ArrayList<Integer> roomNums = new ArrayList<>();
-			for (ArrayList<String> room : roomsArray) {
-				int roomNum = Integer.parseInt(room.get(0));
-				if (room.get(1).equals(roomType.toString().toLowerCase())) {
+			for (Room room : roomsArray) {
+				int roomNum = room.getRoomNumber();
+				if (room.getRoomType().equals(roomType)) {
 					if (isAvailable(roomNum, checkin, checkout)) {
 						roomNums.add(roomNum);
 					}
@@ -439,50 +439,31 @@ public class HotelImpl implements Hotel {
 				int roomID = roomChoice[0];
 
 				int lenArr = bookingsArray.size() - 1;
-				ArrayList<String> lastItem = bookingsArray.get(lenArr);
-				int prevBookID = Integer.parseInt(lastItem.get(0));
+				Booking lastBooking = bookingsArray.get(lenArr);
+				int prevBookID = lastBooking.getBookingID();
 				int newBookingID = prevBookID + 1;
-
-				ArrayList<String> bookingTempArr = new ArrayList<>();
-				bookingTempArr.add(Integer.toString(newBookingID));
-				bookingTempArr.add(Integer.toString(guestID));
-				bookingTempArr.add(Integer.toString(roomID));
-				bookingTempArr.add(LocalDate.now().toString());
-				bookingTempArr.add(checkin.toString());
-				bookingTempArr.add(checkout.toString());
 
 				// Check if guest is VIP
 				boolean guestVIP = false;
-				for (ArrayList<String> guest : guestsArray) {
-					if (Integer.parseInt(guest.get(0)) == guestID) {
-						if (guest.size() > 4) {
-							if (LocalDate.parse(guest.get(5)).isBefore(LocalDate.now())) {
-								guestVIP = true;
-							}
-						}
+				for (Guest guest : guestsArray) {
+					if (guest.getGuestID() == guestID) {
+						guestVIP = guest.isGuestVIP();
 					}
 				}
 
 				// Calc price of booking
 				double roomPrice = 0;
-				for (ArrayList<String> room : roomsArray) {
-					if (Integer.parseInt(room.get(0)) == roomID) {
-						roomPrice = Double.parseDouble(room.get(2));
+				for (Room room : roomsArray) {
+					if (room.getRoomNumber() == roomID) {
+						roomPrice = room.getPrice();
 						if (guestVIP) {
 							roomPrice -= (roomPrice / 10);
 						}
 					}
 				}
 
-				// Add to payment array
-				ArrayList<String> paymentTempArr = new ArrayList<>();
-				paymentTempArr.add(LocalDate.now().toString());
-				paymentTempArr.add(Integer.toString(guestID));
-				paymentTempArr.add(Double.toString(roomPrice));
-				paymentTempArr.add("booking");
-
-				bookingsArray.add(bookingTempArr);
-				paymentsArray.add(paymentTempArr);
+				bookingsArray.add(new Booking(newBookingID, guestID, roomID, LocalDate.now(), checkin, checkout));
+				paymentsArray.add(new Payment(LocalDate.now(), guestID, roomPrice, "booking"));
 
 				return roomID;
 			} else {
@@ -510,15 +491,15 @@ public class HotelImpl implements Hotel {
 		try {
 			ArrayList<Integer> IdArray = new ArrayList<>();
 			for (int i = 0; i < guestsArray.size(); i++) {
-				String guestFName = guestsArray.get(i).get(1).toLowerCase();
-				String guestSName = guestsArray.get(i).get(2).toLowerCase();
+				String guestFName = guestsArray.get(i).getFirstName().toLowerCase();
+				String guestSName = guestsArray.get(i).getLastName().toLowerCase();
 
 				firstName = firstName.toLowerCase();
 				lastName = lastName.toLowerCase();
 
 				if (guestFName.equals(firstName) && guestSName.equals(lastName)) {
 					// Add guestId to array
-					IdArray.add(Integer.parseInt(guestsArray.get(i).get(0)));
+					IdArray.add(guestsArray.get(i).getGuestID());
 				}
 			}
 
@@ -546,9 +527,9 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public void displayBookingsOn(LocalDate thisDate) {
-		for (ArrayList<String> booking : bookingsArray) {
-			LocalDate currentCheckin = LocalDate.parse(booking.get(4));
-			LocalDate currentCheckout = LocalDate.parse(booking.get(5));
+		for (Booking booking : bookingsArray) {
+			LocalDate currentCheckin = booking.getBookingCheckin();
+			LocalDate currentCheckout = booking.getBookingCheckout();
 
 			// If the chekin date is between the current booking date, return false
 			if (!(thisDate.isBefore(currentCheckin) || thisDate.isAfter(currentCheckout))) {
@@ -565,7 +546,14 @@ public class HotelImpl implements Hotel {
 	@Override
 	public boolean saveRoomsData(String roomsTxtFileName) {
 		try {
-			saveData(roomsTxtFileName, roomsArray);
+			BufferedWriter writer = new BufferedWriter(new FileWriter(roomsTxtFileName));
+
+			for (Room room : roomsArray) {
+				writer.write(room.toString());
+				writer.newLine();
+			}
+
+			writer.close();
 			return true;
 		} catch (Exception e) {
 			System.out.println(e);
@@ -577,7 +565,14 @@ public class HotelImpl implements Hotel {
 	@Override
 	public boolean saveGuestsData(String guestsTxtFileName) {
 		try {
-			saveData(guestsTxtFileName, guestsArray);
+			BufferedWriter writer = new BufferedWriter(new FileWriter(guestsTxtFileName));
+
+			for (Guest guest : guestsArray) {
+				writer.write(guest.toString());
+				writer.newLine();
+			}
+
+			writer.close();
 			return true;
 		} catch (Exception e) {
 			System.out.println(e);
@@ -588,7 +583,14 @@ public class HotelImpl implements Hotel {
 	@Override
 	public boolean saveBookingsData(String bookingsTxtFileName) {
 		try {
-			saveData(bookingsTxtFileName, bookingsArray);
+			BufferedWriter writer = new BufferedWriter(new FileWriter(bookingsTxtFileName));
+
+			for (Booking booking : bookingsArray) {
+				writer.write(booking.toString());
+				writer.newLine();
+			}
+
+			writer.close();
 			return true;
 		} catch (Exception e) {
 			System.out.println(e);
@@ -599,32 +601,18 @@ public class HotelImpl implements Hotel {
 	@Override
 	public boolean savePaymentsData(String paymentsTxtFileName) {
 		try {
-			saveData(paymentsTxtFileName, paymentsArray);
+			BufferedWriter writer = new BufferedWriter(new FileWriter(paymentsTxtFileName));
+
+			for (Payment payment : paymentsArray) {
+				writer.write(payment.toString());
+				writer.newLine();
+			}
+
+			writer.close();
 			return true;
 		} catch (Exception e) {
 			System.out.println(e);
 		}
 		return false;
-	}
-
-	public void saveData(String txtFileName, ArrayList<ArrayList<String>> mainArray) throws Exception {
-		BufferedWriter writer = new BufferedWriter(new FileWriter(txtFileName));
-		String line = "";
-
-		for (ArrayList<String> item : mainArray) {
-			for (String i : item) {
-				line += i + ",";
-			}
-			String newLine = line.substring(0, line.length() - 1);
-
-			writer.write(newLine);
-			writer.newLine();
-
-			line = "";
-		}
-
-		// remove last line
-
-		writer.close();
 	}
 }
