@@ -126,7 +126,7 @@ public class HotelImpl implements Hotel {
 
 				// The newBooking object is made and then added to the bookingsArray
 				Booking newBooking = new Booking(dataItems.get(0), dataItems.get(1), dataItems.get(2), dataItems.get(3),
-						dataItems.get(4), dataItems.get(5));
+						dataItems.get(4), dataItems.get(5), dataItems.get(6));
 
 				bookingsArray.add(newBooking);
 			}
@@ -447,9 +447,26 @@ public class HotelImpl implements Hotel {
 				int prevBookID = lastBooking.getBookingID();
 				int newBookingID = prevBookID + 1;
 
-				double roomPrice = calcPaymentPrice(guestID, roomID);
+				boolean guestVIP = false;
+				for (Guest guest : guestsArray) {
+					if (guest.getGuestID() == guestID) {
+						guestVIP = guest.isGuestVIP();
+					}
+				}
 
-				bookingsArray.add(new Booking(newBookingID, guestID, roomID, LocalDate.now(), checkin, checkout));
+				// Calc price of booking
+				double roomPrice = 0;
+				for (Room room : roomsArray) {
+					if (room.getRoomNumber() == roomID) {
+						roomPrice = room.getPrice();
+						if (guestVIP) {
+							roomPrice -= (roomPrice / 10);
+						}
+					}
+				}
+
+				bookingsArray
+						.add(new Booking(newBookingID, guestID, roomID, LocalDate.now(), checkin, checkout, roomPrice));
 				paymentsArray.add(new Payment(LocalDate.now(), guestID, roomPrice, "booking"));
 
 				return roomID;
@@ -461,35 +478,6 @@ public class HotelImpl implements Hotel {
 			System.out.println(e.getMessage());
 			return -1;
 		}
-	}
-
-	public double calcPaymentPrice(int guestID, int roomID) {
-		try {
-			// Check if guest is VIP
-			boolean guestVIP = false;
-			for (Guest guest : guestsArray) {
-				if (guest.getGuestID() == guestID) {
-					guestVIP = guest.isGuestVIP();
-				}
-			}
-
-			// Calc price of booking
-			double roomPrice = 0;
-			for (Room room : roomsArray) {
-				if (room.getRoomNumber() == roomID) {
-					roomPrice = room.getPrice();
-					if (guestVIP) {
-						roomPrice -= (roomPrice / 10);
-					}
-				}
-			}
-			return roomPrice;
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			assert false;
-			return -1;
-		}
-
 	}
 
 	@Override
@@ -516,8 +504,8 @@ public class HotelImpl implements Hotel {
 				LocalDate today = LocalDate.now();
 
 				if (today.plusDays(2).isBefore(booking.getBookingCheckin())) {
-					double refundAmount = calcPaymentPrice(booking.getBookingGuestID(), booking.getBookingRoomNum());
-					paymentsArray.add(new Payment(today, booking.getBookingGuestID(), -refundAmount, "refund"));
+					paymentsArray
+							.add(new Payment(today, booking.getBookingGuestID(), -booking.getBookingPrice(), "refund"));
 				}
 				return true;
 			}
@@ -563,17 +551,17 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public void displayGuestBooking(int guestID) {
-		for (Guest guest : guestsArray) {
-			for (Booking booking : bookingsArray){
-				if(guest.getGuestID() == booking.getBookingGuestID()){
-					System.out.println(booking.toString());
-				}
+		System.out.println("Display guest booking: ");
+		for (Booking booking : bookingsArray) {
+			if (guestID == booking.getBookingGuestID()) {
+				System.out.println(booking.toString());
 			}
 		}
 	}
 
 	@Override
 	public void displayBookingsOn(LocalDate thisDate) {
+		System.out.println("Display bookings on: ");
 		for (Booking booking : bookingsArray) {
 			LocalDate currentCheckin = booking.getBookingCheckin();
 			LocalDate currentCheckout = booking.getBookingCheckout();
@@ -587,8 +575,9 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public void displayPaymentsOn(LocalDate thisDate) {
+		System.out.println("Display paymemts on: ");
 		for (Payment payment : paymentsArray) {
-			if (payment.getPaymentDate() == thisDate) {
+			if (payment.getPaymentDate().equals(thisDate)) {
 				System.out.println(payment.toString());
 			}
 		}

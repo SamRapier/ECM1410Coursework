@@ -9,25 +9,28 @@ public class Booking {
 	private LocalDate bookingDate;
 	private LocalDate checkin;
 	private LocalDate checkout;
+	private double price;
 
 	public Booking(int bookingID, int guestID, int roomNumber, LocalDate bookingDate, LocalDate checkin,
-			LocalDate checkout) {
+			LocalDate checkout, double price) {
 		this.bookingID = bookingID;
 		this.guestID = guestID;
 		this.roomNumber = roomNumber;
 		this.bookingDate = bookingDate;
 		this.checkin = checkin;
 		this.checkout = checkout;
+		this.price = price;
 	}
 
 	public Booking(String bookingID, String guestID, String roomNumber, String bookingDate, String checkin,
-			String checkout) {
+			String checkout, String price) {
 		this.bookingID = Integer.parseInt(bookingID);
 		this.guestID = Integer.parseInt(guestID);
 		this.roomNumber = Integer.parseInt(roomNumber);
 		this.bookingDate = LocalDate.parse(bookingDate);
 		this.checkin = LocalDate.parse(checkin);
 		this.checkout = LocalDate.parse(checkout);
+		this.price = Double.parseDouble(price);
 	}
 
 	public int getBookingID() {
@@ -50,6 +53,10 @@ public class Booking {
 		return checkout;
 	}
 
+	public double getBookingPrice() {
+		return price;
+	}
+
 	public boolean isBetweenCheckInOut(LocalDate givenDate) {
 		// If the chekin date is between the current booking date, return true
 		if (!(givenDate.isBefore(checkin) || givenDate.isAfter(checkout))) {
@@ -59,6 +66,7 @@ public class Booking {
 	}
 
 	public String toString() {
-		return bookingID + "," + guestID + "," + roomNumber + "," + bookingDate + "," + checkin + "," + checkout;
+		return bookingID + "," + guestID + "," + roomNumber + "," + bookingDate + "," + checkin + "," + checkout + ","
+				+ price;
 	}
 }
