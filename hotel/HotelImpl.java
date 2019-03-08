@@ -26,6 +26,8 @@ public class HotelImpl implements Hotel {
 	public HotelImpl(String roomsTxtFileName, String bookingsTxtFileName, String guestsTxtFileName,
 			String paymentsTxtFileName) {
 
+		// imports all the files, outputs that the file has loaded if it has been
+		// successful.
 		if (importRoomsData(roomsTxtFileName)) {
 			System.out.println("Rooms file loaded");
 		}
@@ -61,7 +63,6 @@ public class HotelImpl implements Hotel {
 				// The newRoom object is made and then added to the roomsArray
 				Room newRoom = new Room(dataItems.get(0), dataItems.get(1), dataItems.get(2), dataItems.get(3),
 						dataItems.get(4));
-				// the dataItems array is added to the mainArray
 
 				roomsArray.add(newRoom);
 			}
@@ -168,6 +169,11 @@ public class HotelImpl implements Hotel {
 		}
 	}
 
+	/**
+	 * 
+	 * @param dataItems
+	 * @param line
+	 */
 	public void separateDataItems(String line, ArrayList<String> dataItems) {
 		// loop each letter until a comma is found, add all data before that comma to
 		// array element
@@ -369,15 +375,13 @@ public class HotelImpl implements Hotel {
 						// searched for
 						if (booking.getBookingRoomNum() == roomNumber) {
 							// initialises the bookingCHeckin date and the bookingCheckout date
-							LocalDate bookingCheckin = booking.getBookingCheckin();
-							LocalDate bookingCheckout = booking.getBookingCheckout();
 
 							// If the chekin date is between the current booking date, return false
-							if (!(checkin.isBefore(bookingCheckin) || checkin.isAfter(bookingCheckout))) {
+							if (booking.isBetweenCheckInOut(checkin)) {
 								return false;
 
 								// If the checkout date is between the current booking date, return false
-							} else if (!(checkout.isBefore(bookingCheckin) || checkout.isAfter(bookingCheckout))) {
+							} else if (booking.isBetweenCheckInOut(checkout)) {
 								return false;
 							}
 
@@ -443,24 +447,7 @@ public class HotelImpl implements Hotel {
 				int prevBookID = lastBooking.getBookingID();
 				int newBookingID = prevBookID + 1;
 
-				// Check if guest is VIP
-				boolean guestVIP = false;
-				for (Guest guest : guestsArray) {
-					if (guest.getGuestID() == guestID) {
-						guestVIP = guest.isGuestVIP();
-					}
-				}
-
-				// Calc price of booking
-				double roomPrice = 0;
-				for (Room room : roomsArray) {
-					if (room.getRoomNumber() == roomID) {
-						roomPrice = room.getPrice();
-						if (guestVIP) {
-							roomPrice -= (roomPrice / 10);
-						}
-					}
-				}
+				double roomPrice = calcPaymentPrice(guestID, roomID);
 
 				bookingsArray.add(new Booking(newBookingID, guestID, roomID, LocalDate.now(), checkin, checkout));
 				paymentsArray.add(new Payment(LocalDate.now(), guestID, roomPrice, "booking"));
@@ -476,13 +463,65 @@ public class HotelImpl implements Hotel {
 		}
 	}
 
+	public double calcPaymentPrice(int guestID, int roomID) {
+		try {
+			// Check if guest is VIP
+			boolean guestVIP = false;
+			for (Guest guest : guestsArray) {
+				if (guest.getGuestID() == guestID) {
+					guestVIP = guest.isGuestVIP();
+				}
+			}
+
+			// Calc price of booking
+			double roomPrice = 0;
+			for (Room room : roomsArray) {
+				if (room.getRoomNumber() == roomID) {
+					roomPrice = room.getPrice();
+					if (guestVIP) {
+						roomPrice -= (roomPrice / 10);
+					}
+				}
+			}
+			return roomPrice;
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			assert false;
+			return -1;
+		}
+
+	}
+
 	@Override
 	public boolean checkOut(int bookingID, LocalDate actualCheckoutDate) {
+		for (int i = 0; i < bookingsArray.size(); i++) {
+			Booking booking = bookingsArray.get(i);
+			if (booking.getBookingID() == bookingID) {
+				if (booking.isBetweenCheckInOut(actualCheckoutDate)) {
+					bookingsArray.remove(i);
+					return true;
+				}
+				return false;
+			}
+		}
 		return false;
 	}
 
 	@Override
 	public boolean cancelBooking(int bookingID) {
+		for (int i = 0; i < bookingsArray.size(); i++) {
+			Booking booking = bookingsArray.get(i);
+
+			if (booking.getBookingID() == bookingID) {
+				LocalDate today = LocalDate.now();
+
+				if (today.plusDays(2).isBefore(booking.getBookingCheckin())) {
+					double refundAmount = calcPaymentPrice(booking.getBookingGuestID(), booking.getBookingRoomNum());
+					paymentsArray.add(new Payment(today, booking.getBookingGuestID(), -refundAmount, "refund"));
+				}
+				return true;
+			}
+		}
 		return false;
 	}
 

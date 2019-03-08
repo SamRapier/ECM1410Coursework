@@ -50,6 +50,14 @@ public class Booking {
 		return checkout;
 	}
 
+	public boolean isBetweenCheckInOut(LocalDate givenDate) {
+		// If the chekin date is between the current booking date, return true
+		if (!(givenDate.isBefore(checkin) || givenDate.isAfter(checkout))) {
+			return true;
+		}
+		return false;
+	}
+
 	public String toString() {
 		return bookingID + "," + guestID + "," + roomNumber + "," + bookingDate + "," + checkin + "," + checkout;
 	}
