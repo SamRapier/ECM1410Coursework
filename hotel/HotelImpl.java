@@ -529,16 +529,18 @@ public class HotelImpl implements Hotel {
 	public int[] searchGuest(String firstName, String lastName) {
 		try {
 			ArrayList<Integer> IdArray = new ArrayList<>();
-			for (int i = 0; i < guestsArray.size(); i++) {
-				String guestFName = guestsArray.get(i).getFirstName().toLowerCase();
-				String guestSName = guestsArray.get(i).getLastName().toLowerCase();
+			for (Guest guest : guestsArray) {
+				String guestFName = guest.getFirstName().toLowerCase();
+				String guestSName = guest.getLastName().toLowerCase();
 
 				firstName = firstName.toLowerCase();
 				lastName = lastName.toLowerCase();
 
 				if (guestFName.equals(firstName) && guestSName.equals(lastName)) {
 					// Add guestId to array
-					IdArray.add(guestsArray.get(i).getGuestID());
+					IdArray.add(guest.getGuestID());
+					System.out.println(guest.toString());
+					displayGuestBooking(guest.getGuestID());
 				}
 			}
 
@@ -561,7 +563,13 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public void displayGuestBooking(int guestID) {
-
+		for (Guest guest : guestsArray) {
+			for (Booking booking : bookingsArray){
+				if(guest.getGuestID() == booking.getBookingGuestID()){
+					System.out.println(booking.toString());
+				}
+			}
+		}
 	}
 
 	@Override
@@ -579,7 +587,11 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public void displayPaymentsOn(LocalDate thisDate) {
-
+		for (Payment payment : paymentsArray) {
+			if (payment.getPaymentDate() == thisDate) {
+				System.out.println(payment.toString());
+			}
+		}
 	}
 
 	@Override
