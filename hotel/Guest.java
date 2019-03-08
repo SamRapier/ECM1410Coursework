@@ -58,7 +58,7 @@ public class Guest {
 	}
 
 	public boolean isGuestVIP() {
-		if (LocalDate.now().isBefore(VIPexpiryDate)) {
+		if (VIPexpiryDate != null && LocalDate.now().isBefore(VIPexpiryDate)) {
 			return true;
 		}
 		return false;

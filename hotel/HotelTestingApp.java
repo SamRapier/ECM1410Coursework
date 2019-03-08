@@ -9,9 +9,6 @@ public class HotelTestingApp {
 		// boolean loadedRooms = testHotel.importRoomsData("data\\rooms.txt");
 		// System.out.println(loadedRooms);
 
-		int[] test = new int[0];
-		System.out.println(test == null);
-
 		testHotel.displayAllRooms();
 		testHotel.displayAllGuests();
 		testHotel.displayAllBookings();
@@ -35,7 +32,6 @@ public class HotelTestingApp {
 				LocalDate.parse("2020-03-07"));
 
 		testHotel.removeGuest(10006);
-		System.out.println("Guests:");
 		testHotel.displayAllGuests();
 
 		// testHotel.saveRoomsData("data\\rooms.txt");
