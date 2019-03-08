@@ -92,7 +92,7 @@ public class HotelImpl implements Hotel {
 				// The newGuest object is made and then added to the guestArray
 				Guest newGuest;
 				if (dataItems.size() == 6) {
-					newGuest = new Guest(dataItems.get(0), dataItems.get(1), dataItems.get(2), dataItems.get(3),
+					newGuest = new VIPGuest(dataItems.get(0), dataItems.get(1), dataItems.get(2), dataItems.get(3),
 							dataItems.get(4), dataItems.get(5));
 				} else {
 					newGuest = new Guest(dataItems.get(0), dataItems.get(1), dataItems.get(2), dataItems.get(3));
@@ -313,7 +313,7 @@ public class HotelImpl implements Hotel {
 			// increments the last guestID by 1 to get the newID
 			int newID = prevGuestID + 1;
 
-			guestsArray.add(new Guest(newID, fName, lName, dateJoin, VIPstartDate, VIPexpiryDate));
+			guestsArray.add(new VIPGuest(newID, fName, lName, dateJoin, VIPstartDate, VIPexpiryDate));
 			paymentsArray.add(new Payment(LocalDate.now(), newID, 50.00, "VIPmembership"));
 			return true;
 		} catch (Exception e) {

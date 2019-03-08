@@ -7,8 +7,6 @@ public class Guest {
 	private String firstName;
 	private String lastName;
 	private LocalDate dateJoin;
-	private LocalDate VIPstartDate;
-	private LocalDate VIPexpiryDate;
 
 	public Guest(int guestID, String firstName, String lastName, LocalDate dateJoin) {
 		this.guestID = guestID;
@@ -24,20 +22,6 @@ public class Guest {
 		this.dateJoin = LocalDate.parse(dateJoin);
 	}
 
-	public Guest(int guestID, String firstName, String lastName, LocalDate dateJoin, LocalDate VIPstartDate,
-			LocalDate VIPexpiryDate) {
-		this(guestID, firstName, lastName, dateJoin);
-		this.VIPstartDate = VIPstartDate;
-		this.VIPexpiryDate = VIPexpiryDate;
-	}
-
-	public Guest(String guestID, String firstName, String lastName, String dateJoin, String VIPstartDate,
-			String VIPexpiryDate) {
-		this(guestID, firstName, lastName, dateJoin);
-		this.VIPstartDate = LocalDate.parse(VIPstartDate);
-		this.VIPexpiryDate = LocalDate.parse(VIPexpiryDate);
-	}
-
 	public int getGuestID() {
 		return guestID;
 	}
@@ -50,25 +34,15 @@ public class Guest {
 		return lastName;
 	}
 
-	public LocalDate getVIPexipryDate() {
-		if (isGuestVIP())
-			return VIPexpiryDate;
-		else
-			return null;
-	}
-
 	public boolean isGuestVIP() {
-		if (VIPexpiryDate != null && LocalDate.now().isBefore(VIPexpiryDate)) {
-			return true;
-		}
 		return false;
 	}
 
+	public LocalDate getVIPexipryDate() {
+		return null;
+	}
+
 	public String toString() {
-		if (isGuestVIP())
-			return guestID + "," + firstName + "," + lastName + "," + dateJoin + "," + VIPstartDate + ","
-					+ VIPexpiryDate;
-		else
-			return guestID + "," + firstName + "," + lastName + "," + dateJoin;
+		return guestID + "," + firstName + "," + lastName + "," + dateJoin;
 	}
 }
