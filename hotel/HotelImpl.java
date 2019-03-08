@@ -548,7 +548,11 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public void displayPaymentsOn(LocalDate thisDate) {
-
+		for (Payment payment : paymentsArray) {
+			if (payment.getPaymentDate() == thisDate) {
+				System.out.println(payment.toString());
+			}
+		}
 	}
 
 	@Override
