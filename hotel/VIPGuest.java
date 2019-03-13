@@ -31,6 +31,7 @@ public class VIPGuest extends Guest {
 		return VIPexpiryDate;
 	}
 
+	@Override
 	public String toString() {
 		return super.toString() + "," + VIPstartDate + "," + VIPexpiryDate;
 	}
