@@ -587,6 +587,8 @@ public class HotelImpl implements Hotel {
 	@Override
 	public void displayGuestBooking(int guestID) {
 		System.out.println("Display guest booking: ");
+		// Loops through the booking array and finds the corresponding guest ID
+		// and prints all of the booking details which matches that ID
 		for (Booking booking : bookingsArray) {
 			if (guestID == booking.getBookingGuestID()) {
 				System.out.println(booking.toString());
@@ -597,11 +599,13 @@ public class HotelImpl implements Hotel {
 	@Override
 	public void displayBookingsOn(LocalDate thisDate) {
 		System.out.println("Display bookings on: ");
+		// Loops through the booking array
 		for (Booking booking : bookingsArray) {
+			// Initialising variables
 			LocalDate currentCheckin = booking.getBookingCheckin();
 			LocalDate currentCheckout = booking.getBookingCheckout();
 
-			// If the chekin date is between the current booking date, return false
+			// If the checkin date is between the current booking date, return false
 			if (!(thisDate.isBefore(currentCheckin) || thisDate.isAfter(currentCheckout))) {
 				System.out.println(booking);
 			}
@@ -611,7 +615,10 @@ public class HotelImpl implements Hotel {
 	@Override
 	public void displayPaymentsOn(LocalDate thisDate) {
 		System.out.println("Display paymemts on: ");
+		// Loops through the payments array
 		for (Payment payment : paymentsArray) {
+			// If the payment date matches the inputted date then all of the payment information
+			// is printed in string form separated by commas
 			if (payment.getPaymentDate().equals(thisDate)) {
 				System.out.println(payment.toString());
 			}
@@ -620,6 +627,7 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public boolean saveRoomsData(String roomsTxtFileName) {
+		// Loops through the array and adds the string representation of the data to the file
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(roomsTxtFileName));
 
@@ -639,6 +647,7 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public boolean saveGuestsData(String guestsTxtFileName) {
+		// Loops through the array and adds the string representation of the data to the file
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(guestsTxtFileName));
 
@@ -658,6 +667,7 @@ public class HotelImpl implements Hotel {
 	@Override
 	public boolean saveBookingsData(String bookingsTxtFileName) {
 		try {
+			// Loops through the array and adds the string representation of the data to the file
 			BufferedWriter writer = new BufferedWriter(new FileWriter(bookingsTxtFileName));
 
 			for (Booking booking : bookingsArray) {
@@ -676,6 +686,7 @@ public class HotelImpl implements Hotel {
 	@Override
 	public boolean savePaymentsData(String paymentsTxtFileName) {
 		try {
+			// Loops through the array and adds the string representation of the data to the file
 			BufferedWriter writer = new BufferedWriter(new FileWriter(paymentsTxtFileName));
 
 			for (Payment payment : paymentsArray) {
