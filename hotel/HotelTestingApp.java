@@ -30,8 +30,11 @@ public class HotelTestingApp {
 
 		int[] availableRooms = testHotel.availableRooms(RoomType.SINGLE, LocalDate.parse("2019-04-12"),
 				LocalDate.parse("2019-04-14"));
-		for (int i : availableRooms) {
-			System.out.println("This room is available: " + i);
+
+		if (availableRooms != null) {
+			for (int i : availableRooms) {
+				System.out.println("This room is available: " + i);
+			}
 		}
 
 		int bookedRoomNum = testHotel.bookOneRoom(10007, RoomType.TWIN, LocalDate.parse("2019-04-01"),
