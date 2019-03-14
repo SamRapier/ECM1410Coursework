@@ -103,6 +103,8 @@ public class HotelImpl implements Hotel {
 
 				// The newGuest object is made and then added to the guestArray
 				Guest newGuest;
+				// This checks the size of the dataItems array, if there are 6 elements in the
+				// array, the guest is a VIP, otherwise they are a standard guest
 				if (dataItems.size() == 6) {
 					newGuest = new VIPGuest(dataItems.get(0), dataItems.get(1), dataItems.get(2), dataItems.get(3),
 							dataItems.get(4), dataItems.get(5));
@@ -110,6 +112,7 @@ public class HotelImpl implements Hotel {
 					newGuest = new Guest(dataItems.get(0), dataItems.get(1), dataItems.get(2), dataItems.get(3));
 				}
 
+				// Adds the newGuest object to the guestsArray
 				guestsArray.add(newGuest);
 			}
 			br.close();
@@ -261,6 +264,7 @@ public class HotelImpl implements Hotel {
 						.getRoomNumber() == roomNumber) : "Cannot add room, Room number already exists";
 			}
 
+			// Adds a Room object to the roomsArray
 			roomsArray.add(new Room(roomNumber, roomType, price, capacity, facilities));
 			return true;
 		} catch (Exception e) {
@@ -318,6 +322,7 @@ public class HotelImpl implements Hotel {
 			// increments the last guestID by 1 to get the newID
 			int newID = prevGuestID + 1;
 
+			// Adds a new Guest object to the guestsArray
 			guestsArray.add(new Guest(newID, fName, lName, dateJoin));
 			return true;
 		} catch (Exception e) {
@@ -339,7 +344,10 @@ public class HotelImpl implements Hotel {
 			// increments the last guestID by 1 to get the newID
 			int newID = prevGuestID + 1;
 
+			// Adds a new VIPGuest object to the guestsArray
 			guestsArray.add(new VIPGuest(newID, fName, lName, dateJoin, VIPstartDate, VIPexpiryDate));
+
+			// Adds a new Payment object to the paymentsArray sicne this is a VIP memeber
 			paymentsArray.add(new Payment(LocalDate.now(), newID, 50.00, "VIPmembership"));
 			return true;
 		} catch (Exception e) {
@@ -472,13 +480,15 @@ public class HotelImpl implements Hotel {
 			// checks to ensure there are values in the roomChoice array
 			if (roomChoice != null) {
 
+				// This creates a new unique ID for each booking
+				// gets the last item in the bookingsArray and increases the ID by 1
 				int roomID = roomChoice[0];
-
 				int lenArr = bookingsArray.size() - 1;
 				Booking lastBooking = bookingsArray.get(lenArr);
 				int prevBookID = lastBooking.getBookingID();
 				int newBookingID = prevBookID + 1;
 
+				// Checks if the guestID provided is a VIPGuest
 				boolean guestVIP = false;
 				for (Guest guest : guestsArray) {
 					if (guest.getGuestID() == guestID) {
@@ -491,14 +501,19 @@ public class HotelImpl implements Hotel {
 				for (Room room : roomsArray) {
 					if (room.getRoomNumber() == roomID) {
 						roomPrice = room.getPrice();
+
+						// 10% off price is guest if VIP
 						if (guestVIP) {
 							roomPrice -= (roomPrice / 10);
 						}
 					}
 				}
 
+				// Adds a new Booking object to the bookingsArray
 				bookingsArray
 						.add(new Booking(newBookingID, guestID, roomID, LocalDate.now(), checkin, checkout, roomPrice));
+
+				// Adds a new Payment object to the paymentsArray for the booking
 				paymentsArray.add(new Payment(LocalDate.now(), guestID, roomPrice, "booking"));
 
 				return roomID;
@@ -514,14 +529,17 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public boolean checkOut(int bookingID, LocalDate actualCheckoutDate) {
-		// Loops through the bookings array and if the booking ID matches the one in the array the booking is removed
+		// Loops through the bookings array and if the booking ID matches the one in the
+		// array the booking is removed
 		for (int i = 0; i < bookingsArray.size(); i++) {
 			Booking booking = bookingsArray.get(i);
 			if (booking.getBookingID() == bookingID) {
+				// Checks that the checkout date is between duration of the booking
 				if (booking.isBetweenCheckInOut(actualCheckoutDate)) {
 					bookingsArray.remove(i);
 					return true;
 				}
+				assert false : "Cannot checkout booking unless you have checked in";
 				return false;
 			}
 		}
@@ -530,19 +548,26 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public boolean cancelBooking(int bookingID) {
+		// Loops through the looking for the correspinding bookingID
 		for (int i = 0; i < bookingsArray.size(); i++) {
 			Booking booking = bookingsArray.get(i);
 
 			if (booking.getBookingID() == bookingID) {
 				LocalDate today = LocalDate.now();
 
+				// Checks if the today is 2 days before the checking date,
+				// if so provides a refund
 				if (today.plusDays(2).isBefore(booking.getBookingCheckin())) {
 					paymentsArray
 							.add(new Payment(today, booking.getBookingGuestID(), -booking.getBookingPrice(), "refund"));
 				}
+
+				// Removes the booking from the bookingsArray for it to be canceled
+				bookingsArray.remove(i);
 				return true;
 			}
 		}
+		assert false : "Could not find bookingID to cancel the booking";
 		return false;
 	}
 
@@ -551,20 +576,27 @@ public class HotelImpl implements Hotel {
 		try {
 			ArrayList<Integer> IdArray = new ArrayList<>();
 			for (Guest guest : guestsArray) {
+
+				// Initialising varaibles
 				String guestFName = guest.getFirstName().toLowerCase();
 				String guestSName = guest.getLastName().toLowerCase();
 
 				firstName = firstName.toLowerCase();
 				lastName = lastName.toLowerCase();
 
+				// If the first name and the last name are the same as the ones in the current
+				// guest
 				if (guestFName.equals(firstName) && guestSName.equals(lastName)) {
 					// Add guestId to array
 					IdArray.add(guest.getGuestID());
+
+					// Output information about the guest and their booking
 					System.out.println(guest.toString());
 					displayGuestBooking(guest.getGuestID());
 				}
 			}
 
+			// Converts the arrayList to an simple array so that the array and be returned
 			if (IdArray.size() > 0) {
 				int[] guestIDs = new int[IdArray.size()];
 				for (int i = 0; i < IdArray.size(); i++) {
@@ -587,16 +619,23 @@ public class HotelImpl implements Hotel {
 	@Override
 	public void displayGuestBooking(int guestID) {
 		System.out.println("Display guest booking: ");
+		boolean bookingFound = false;
+
 		for (Booking booking : bookingsArray) {
 			if (guestID == booking.getBookingGuestID()) {
 				System.out.println(booking.toString());
+				bookingFound = true;
 			}
 		}
+
+		assert bookingFound : "No booking found for guestID provided";
 	}
 
 	@Override
 	public void displayBookingsOn(LocalDate thisDate) {
 		System.out.println("Display bookings on: ");
+		boolean bookingFound = false;
+
 		for (Booking booking : bookingsArray) {
 			LocalDate currentCheckin = booking.getBookingCheckin();
 			LocalDate currentCheckout = booking.getBookingCheckout();
@@ -604,18 +643,25 @@ public class HotelImpl implements Hotel {
 			// If the chekin date is between the current booking date, return false
 			if (!(thisDate.isBefore(currentCheckin) || thisDate.isAfter(currentCheckout))) {
 				System.out.println(booking);
+				bookingFound = true;
 			}
 		}
+		assert bookingFound : "No booking found on date provided";
 	}
 
 	@Override
 	public void displayPaymentsOn(LocalDate thisDate) {
 		System.out.println("Display paymemts on: ");
+		boolean paymentFound = false;
+
 		for (Payment payment : paymentsArray) {
 			if (payment.getPaymentDate().equals(thisDate)) {
 				System.out.println(payment.toString());
+				paymentFound = true;
 			}
 		}
+
+		assert paymentFound : "No payments found on date provided";
 	}
 
 	@Override

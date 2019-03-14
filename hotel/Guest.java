@@ -11,10 +11,10 @@ public class Guest {
 	/**
 	 * This is the constructor for the guest class
 	 * 
-	 * @param guestID - int
-	 * @param firstName - String
-	 * @param lastName - String
-	 * @param dateJoin - LocalDate
+	 * @param guestID   The unique ID of the guest
+	 * @param firstName The first name of the guest
+	 * @param lastName  The last name of the guest
+	 * @param dateJoin  The date the guest joined
 	 */
 	public Guest(int guestID, String firstName, String lastName, LocalDate dateJoin) {
 		this.guestID = guestID;
@@ -29,10 +29,10 @@ public class Guest {
 	 * 
 	 * This constructor is used when reading from the file.
 	 * 
-	 * @param guestID   - String
-	 * @param firstName - String
-	 * @param lastName  - String
-	 * @param dateJoin  - String
+	 * @param guestID   The unique ID of the guest
+	 * @param firstName The first name of the guest
+	 * @param lastName  The last name of the guest
+	 * @param dateJoin  The date the guest joined
 	 */
 	public Guest(String guestID, String firstName, String lastName, String dateJoin) {
 		this.guestID = Integer.parseInt(guestID);
