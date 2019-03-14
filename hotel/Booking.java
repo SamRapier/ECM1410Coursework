@@ -117,7 +117,7 @@ public class Booking {
 	 * date otherwise it returns false
 	 */
 	public boolean isBetweenCheckInOut(LocalDate givenDate) {
-		// If the chekin date is between the current booking date, return true
+		// If the checkin date is between the current booking date, return true
 		if (!(givenDate.isBefore(checkin) || givenDate.isAfter(checkout))) {
 			return true;
 		}

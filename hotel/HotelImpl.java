@@ -416,7 +416,7 @@ public class HotelImpl implements Hotel {
 					}
 				}
 			}
-
+			// Converts an array list into an array so it can be returned
 			if (roomNums.size() > 0) {
 				int[] rooms = new int[roomNums.size()];
 				for (int i = 0; i < roomNums.size(); i++) {
@@ -482,6 +482,7 @@ public class HotelImpl implements Hotel {
 
 	@Override
 	public boolean checkOut(int bookingID, LocalDate actualCheckoutDate) {
+		// Loops through the bookings array and if the booking ID matches the one in the array the booking is removed
 		for (int i = 0; i < bookingsArray.size(); i++) {
 			Booking booking = bookingsArray.get(i);
 			if (booking.getBookingID() == bookingID) {
