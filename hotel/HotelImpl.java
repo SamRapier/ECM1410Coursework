@@ -30,15 +30,26 @@ public class HotelImpl implements Hotel {
 		// successful.
 		if (importRoomsData(roomsTxtFileName)) {
 			System.out.println("Rooms file loaded");
+		} else {
+			assert false : "room file cannot be loaded";
 		}
+
 		if (importGuestsData(guestsTxtFileName)) {
 			System.out.println("Guests file loaded");
+		} else {
+			assert false : "guest file cannot be loaded";
 		}
+
 		if (importBookingsData(bookingsTxtFileName)) {
 			System.out.println("Bookings file loaded");
+		} else {
+			assert false : "booking file cannot be loaded";
 		}
+
 		if (importPaymentsData(paymentsTxtFileName)) {
 			System.out.println("Payments file loaded");
+		} else {
+			assert false : "payments file cannot be loaded";
 		}
 	}
 
@@ -170,9 +181,14 @@ public class HotelImpl implements Hotel {
 	}
 
 	/**
+	 * Looks through each line a the file and seperated the words which are
+	 * seperated by commas
 	 * 
 	 * @param dataItems
 	 * @param line
+	 * 
+	 * @return an arrayList which has a each of the words from the line as a
+	 *         different array element
 	 */
 	public void separateDataItems(String line, ArrayList<String> dataItems) {
 		// loop each letter until a comma is found, add all data before that comma to
@@ -241,6 +257,8 @@ public class HotelImpl implements Hotel {
 				if (roomsArray.get(i).getRoomNumber() == roomNumber) {
 					return false;
 				}
+				assert (roomsArray.get(i)
+						.getRoomNumber() == roomNumber) : "Cannot add room, Room number already exists";
 			}
 
 			roomsArray.add(new Room(roomNumber, roomType, price, capacity, facilities));
@@ -268,6 +286,7 @@ public class HotelImpl implements Hotel {
 						System.out.println("Error - Cannot remove room - Room has a booking in future");
 						return false;
 					}
+					assert (currentDate.isBefore(checkout)) : "Cannot remove room, Room has a booking in future";
 				}
 			}
 
@@ -279,6 +298,7 @@ public class HotelImpl implements Hotel {
 					return true;
 				}
 			}
+			assert false : "Room cannot be found in the room array";
 		} catch (Exception e) {
 			System.out.println(e);
 			return false;
@@ -342,8 +362,10 @@ public class HotelImpl implements Hotel {
 					// removed
 					if (currentDate.isBefore(checkout)) {
 						System.out.println("Error - Cannot remove guest - Guest has a booking in future");
+						// throw new IllegalArgumentException();
 						return false;
 					}
+					assert (currentDate.isBefore(checkout)) : "Cannot remove guest as they have a booking in future";
 				}
 			}
 
@@ -355,6 +377,7 @@ public class HotelImpl implements Hotel {
 					return true;
 				}
 			}
+			assert false : "Guest cannot be found in the guest array";
 		} catch (Exception e) {
 			System.out.println(e);
 			return false;
@@ -424,6 +447,8 @@ public class HotelImpl implements Hotel {
 				}
 				return rooms;
 			} else {
+				assert (roomNums.size() > 0) : "No available rooms found";
+				System.out.println("There are no available rooms");
 				return null;
 			}
 
@@ -436,6 +461,13 @@ public class HotelImpl implements Hotel {
 	@Override
 	public int bookOneRoom(int guestID, RoomType roomType, LocalDate checkin, LocalDate checkout) {
 		try {
+			boolean guestFound = false;
+			for (Guest guest : guestsArray) {
+				if (guestID == guest.getGuestID())
+					guestFound = true;
+			}
+			assert guestFound : "Guest must be registed before making a booking";
+
 			int[] roomChoice = availableRooms(roomType, checkin, checkout);
 			// checks to ensure there are values in the roomChoice array
 			if (roomChoice != null) {
@@ -541,6 +573,8 @@ public class HotelImpl implements Hotel {
 				return guestIDs;
 
 			} else {
+				assert (IdArray.size() > 0) : "No guests found";
+				System.out.println("Error - no guests found");
 				return null;
 			}
 
